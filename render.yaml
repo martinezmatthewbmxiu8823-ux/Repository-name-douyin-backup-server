@@ -1,0 +1,22 @@
+# render.yaml - Render自动部署配置
+
+services:
+  # Web服务
+  - type: web
+    name: douyin-backup-server
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGO_URL
+        sync: false
+      - key: DOUYIN_COOKIES
+        sync: false
+
+databases:
+  # MongoDB数据库（需要单独使用MongoDB Atlas）
+  # Render免费版不提供MongoDB，使用外部MongoDB Atlas
