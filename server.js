@@ -19,12 +19,14 @@ const dbName = 'douyin_backup';
 
 async function connectDB() {
   try {
-    const client = await MongoClient.connect(mongoUrl);
+    const client = await MongoClient.connect(mongoUrl, {
+      serverSelectionTimeoutMS: 5000
+    });
     db = client.db(dbName);
     console.log('✅ MongoDB连接成功');
   } catch (error) {
-    console.error('❌ MongoDB连接失败:', error);
-    process.exit(1);
+    console.warn('⚠️ MongoDB连接失败，部分功能不可用:', error.message);
+    db = null;
   }
 }
 
@@ -32,6 +34,12 @@ async function connectDB() {
 
 // 获取指定日期的数据
 app.get('/api/videos/:date', async (req, res) => {
+  if (!db) {
+    return res.status(503).json({
+      success: false,
+      message: 'Database not connected'
+    });
+  }
   try {
     const { date } = req.params;
     const collection = db.collection('videos');
